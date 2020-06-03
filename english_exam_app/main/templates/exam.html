@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %} | Private Diary{% endblock %}
+
+{% block active_diary_list %}active{% endblock %}
+<style>
+        .video-wrapper {
+  position: relative;
+  height: 0;
+  padding: 30px 0 56.25%;
+  overflow: hidden;
+    }
+
+    .video-wrapper iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+    }
+</style>
+<style>
+        ul { list-style: none; }
+    #recordings audio { display: block; margin-bottom: 10px; }
+</style>
+{% block contents %}
+    <div class="my-div-style w-100">
+        <div class="card text-white bg-info mb-3" style="max-width: 100%;">
+          <div class="card-header">三省堂CROWN Jr.5 Lesson1</div>
+          <div class="card-body">
+            <p class="card-text">上から順番に解いていこう。マイクマークをクリックして音声を入力しよう。</p>
+          </div>
+        </div>
+        {% for question in questions %}
+        <div class="card w-100">
+              <div class="card-body">
+                <h5 class="card-title">{{ forloop.counter}}問目</h5>
+                <p class="card-text">{{ question.title}}</p>
+                  <div class="row">
+                      <div class="col-sm-6">
+                          <div class="card card-body">
+                          <h5 class="card-title">問題動画</h5>
+                      <iframe id="ytplayer2" type="text/html" width="320" height="180"
+                          src="{{ question.question_url }}"
+                          frameborder="0"></iframe>
+                          </div>
+                      </div>
+                      <div class="col-sm-6">
+                          <div class="card card-body">
+                          <h5 class="card-title">ヒント</h5>
+                              <img src="{{ question.hint_photo.url}}" width="320" height="180"/>
+                        </div>
+                      </div>
+                  </div>
+                      <p></p>
+                        <button onclick="startRecording(this)">record</button>
+                         <button onclick="stopRecording(this)" disabled>stop</button>
+                      <div class="row">
+                        <div id="recordings"></div>
+                      </div>
+                      <div class="row">
+                        <p id="translation"></p><br>
+                          <p id="confidence"></p>
+                      </div>
+
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <a class="btn btn-info mt-5 ml-2 mb-3" href="{% url 'main:exam' %}">提出</a>
+    <script>
+        var apiKey = 'AIzaSyDNurjZdypLgMdfmjdH2FXX7aSnebK7WYo';
+      let audio_context;
+        let recorder;
+
+        function arrayBufferToBase64(buffer) {
+            let binary = '';
+            let bytes = new Float32Array(buffer);
+            let len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+
+        function startUserMedia(stream) {
+            let input = audio_context.createMediaStreamSource(stream);
+
+            recorder = new Recorder(input);
+        }
+
+    function startRecording(button){
+            audio_context.resume()
+            recorder && recorder.record();
+            button.disabled = true;
+            button.nextElementSibling.disabled = false;
+            console.log("record start")
+        };
+
+      function stopRecording(button) {
+        recorder && recorder.stop();
+        button.disabled = true;
+        button.previousElementSibling.disabled = false;
+        audioRecognize();
+
+        // create WAV download link using audio data blob
+        createDownloadLink();
+
+        recorder.clear();
+      }
+    function createDownloadLink() {
+        recorder && recorder.exportWAV(function(blob) {
+          var url = URL.createObjectURL(blob);
+          var li = document.createElement('li');
+          var au = document.createElement('audio');
+          var hf = document.createElement('a');
+            const recordings = document.getElementById("recordings");
+          au.controls = true;
+          au.src = url;
+          hf.href = url;
+          hf.download = new Date().toISOString() + '.wav';
+          hf.innerHTML = hf.download;
+          li.appendChild(au);
+          li.appendChild(hf);
+          recordings.appendChild(li);
+        });
+      }
+        function audioRecognize() {
+            recorder && recorder.exportWAV(function (blob) {
+                let reader = new FileReader();
+                reader.onload = function () {
+                    let result = new Uint8Array(reader.result); // reader.result is ArrayBuffer
+                    let data = {
+                        "config": {
+                            "encoding": "LINEAR16",
+                            "sampleRateHertz": 44100, // 環境によってかわるっぽいので変えてください(おそらくエラーに正しい値が出てくると思います.
+                             "languageCode": "en-US",
+                            "audio_channel_count": 2
+                        },
+                        "audio": {
+                            "content": arrayBufferToBase64(result)
+                        }
+                    };
+                    console.log("audio send...");
+                    fetch('https://speech.googleapis.com/v1/speech:recognize?key=' + apiKey, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json; charset=utf-8'
+                        },
+                        body: JSON.stringify(data)
+                    }).then(function (response) {
+                        return response.text();
+                    }).then(function (text) {
+                        let result_json = JSON.parse(text);
+                        //テキストデータ自体はresult_json.results[0].alternatives[0].transcriptに格納
+                        console.log("RESULT: " + text);
+                        console.log(result_json.results[0].alternatives[0].transcript);
+                        console.log(data)
+                        document.getElementById("translation").textContent=result_json.results[0].alternatives[0].transcript;
+                        document.getElementById("confidence").textContent=result_json.results[0].alternatives[0].confidence;
+                    });
+                };
+                reader.readAsArrayBuffer(blob)
+
+
+            });
+        }
+
+  window.onload = function init() {
+    try {
+      // webkit shim
+      window.AudioContext = window.AudioContext || window.webkitAudioContext;
+      navigator.getUserMedia = navigator.getUserMedia || navigator.webkitGetUserMedia;
+      window.URL = window.URL || window.webkitURL;
+
+      audio_context = new AudioContext;
+    } catch (e) {
+      alert('No web audio support in this browser!');
+    }
+
+    navigator.getUserMedia({audio: true}, startUserMedia, function(e) {
+      __log('No live audio input: ' + e);
+    });
+  };
+    </script>
+
+{% endblock %}
