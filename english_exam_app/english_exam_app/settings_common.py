@@ -45,7 +45,9 @@ INSTALLED_APPS = [
     'django.contrib.sites',
     'allauth',
     'allauth.account',
-    'django_ses'
+    'django_ses',
+    "jet.dashboard",
+    "jet"
 ]
 
 SITE_ID = 1

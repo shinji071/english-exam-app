@@ -33,7 +33,8 @@ class DiaryListView(LoginRequiredMixin, generic.ListView):
     paginate_by = 2
 
     def get_queryset(self):
-        diaries = Diary.objects.filter(user=self.request.user).order_by('-created_at')
+        #diaries = Diary.objects.filter(user=self.request.user).order_by('-created_at')
+        diaries = Diary.objects.all().order_by('-created_at')
         return diaries
 
 class ScoringListView(LoginRequiredMixin, generic.ListView):
@@ -42,7 +43,8 @@ class ScoringListView(LoginRequiredMixin, generic.ListView):
     paginate_by = 2
 
     def get_queryset(self):
-        diaries = Diary.objects.filter(user=self.request.user).order_by('-created_at')
+        #diaries = Diary.objects.filter(user=self.request.user).order_by('-created_at')
+        diaries = Diary.objects.all().order_by('-created_at')
         return diaries
 
 class DiaryDetailView(LoginRequiredMixin, generic.DetailView):
@@ -96,7 +98,9 @@ class DiaryDeleteView(LoginRequiredMixin, generic.DeleteView):
 class ExamView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
         contents = Question.objects.all()
-        return render(request, 'exam.html', {'questions':contents})
+        # todo データやりとり実施
+        title = "test123"
+        return render(request, 'main/examination.html', {'questions':contents, "title":title })
 
 class ScoringUpdateView(LoginRequiredMixin, generic.DetailView):
     def get(self, request, *args, **kwargs):
