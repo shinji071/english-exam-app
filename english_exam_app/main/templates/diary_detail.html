@@ -78,7 +78,7 @@
         <a class="btn btn-success mt-5 mb-3" href="{% url 'main:diary_update' object.pk %}">編集</a>
         <a class="btn btn-danger mt-5 ml-2 mb-3" href="{% url 'main:diary_delete' object.pk %}">削除</a>
         -->
-        <a class="btn btn-info mt-5 ml-2 mb-3" href="{% url 'main:examination' 3 %}">試験開始</a>
+        <a class="btn btn-info mt-5 ml-2 mb-3" href="{% url 'main:examination' object.pk %}">試験開始</a>
         <a class="btn btn-danger mt-5 ml-2 mb-3" href="#">結果確認</a>
     </div>
 </div>

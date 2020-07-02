@@ -21,7 +21,7 @@
             <div class="col-lg-8 col-md-10 mx-auto">
                 {% for diary in diary_list %}
                     <div class="post-preview">
-                        <a href="{% url 'main:scoring_update' %}">
+                        <a href="{% url 'main:scoring_update' diary.id %}">
                           <h2 class="post-title">
                             {{ diary.title }}
                           </h2>

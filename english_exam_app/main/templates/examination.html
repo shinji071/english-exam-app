@@ -25,22 +25,27 @@
     #recordings audio { display: block; margin-bottom: 10px; }
 </style>
 {% block contents %}
-    <div class="my-div-style w-100">
+
+<form class="row d-flex justify-content-center my-div-style" method="POST" id="upload_content" enctype="multipart/form-data">
+  <div class="col-md-8 my-div-style">
         <div class="card text-white bg-info mb-3" style="max-width: 100%;">
-          <div class="card-header">{{title}}</div>
-          <div class="card-body">
-            <p class="card-text">上から順番に解いていこう。マイクマークをクリックして音声を入力しよう。</p>
-          </div>
+                <div class="d-flex align-items-center p-3 my-3 text-white-50 bg-info rounded shadow-sm">
+                <img class="mr-3" src="/static/img/quest.png" alt="" width="48" height="48">
+                <div class="lh-100">
+                  <h6 class="mb-0 text-white lh-100">{{title}}</h6>
+                  <small>上から順番に解いていこう。マイクマークをクリックして音声を入力しよう。</small>
+                </div>
+              </div>
         </div>
+
         {% for question in questions %}
         <div class="card w-100">
               <div class="card-body">
-                <h5 class="card-title">{{ forloop.counte }}問目</h5>
-                <p class="card-text">{{ question.title}}</p>
+                <h5 class="card-title">{{ forloop.counter }}問目</h5>
                   <div class="row">
                       <div class="col-sm-6">
                           <div class="card card-body">
-                          <h5 class="card-title">問題動画</h5>
+                          <h5 class="card-title">まずは質問を聞いてみよう！</h5>
                       <iframe id="ytplayer2" type="text/html" width="320" height="180"
                           src="{{ question.question_url }}"
                           frameborder="0"></iframe>
@@ -48,27 +53,35 @@
                       </div>
                       <div class="col-sm-6">
                           <div class="card card-body">
-                          <h5 class="card-title">ヒント</h5>
-                              <img src="{{ question.hint_photo.url}}" width="320" height="180"/>
+                          <h5 class="card-title">ヒントを表示
+                                <input type="checkbox" id="{{'myCheck'|add:question.title }}" name="{{'myCheck'|add:question.title }}" onclick="myFunction('{{question.title}}')">
+                              </h5>
+                                <img src="{{ question.hint_photo.url}}" id="{{'img'|add:question.title }}" style="display:none" width="320" height="180"/>
                         </div>
                       </div>
                   </div>
                       <p></p>
                         <button onclick="startRecording(this)">record</button>
-                         <button onclick="stopRecording(this)" disabled>stop</button>
+                         <button onclick="stopRecording(this, '{{question.title}}')" disabled>stop</button>
                       <div class="row">
-                        <div id="recordings"></div>
+                        <div id="{{'recording'|add:question.title}}"></div>
+                          <input type="file" id="{{'audio'|add:question.title}}" name="{{'audio'|add:question.title}}" accept="*" required>
                       </div>
                       <div class="row">
-                        <p id="translation"></p><br>
-                          <p id="confidence"></p>
+                        <input id="{{'translation'|add:question.title}}" name="{{'translation'|add:question.title}}" required></input><br>
+                          <input id="{{'confidence'|add:question.title}}" name="{{'confidence'|add:question.title}}" required></input>
                       </div>
 
             </div>
         </div>
         {% endfor %}
+      <input type ="submit" class="btn btn-info mt-5 ml-2 mb-3"></input>
     </div>
-    <a class="btn btn-info mt-5 ml-2 mb-3" href="{% url 'main:exam' %}">提出</a>
+</form>
+
+
+
+
     <script>
         var apiKey = 'AIzaSyDNurjZdypLgMdfmjdH2FXX7aSnebK7WYo';
       let audio_context;
@@ -98,24 +111,29 @@
             console.log("record start")
         };
 
-      function stopRecording(button) {
+      function stopRecording(button, count) {
         recorder && recorder.stop();
         button.disabled = true;
         button.previousElementSibling.disabled = false;
-        audioRecognize();
+        audioRecognize(count);
 
         // create WAV download link using audio data blob
-        createDownloadLink();
+        createDownloadLink(count);
 
         recorder.clear();
       }
-    function createDownloadLink() {
+    function createDownloadLink(count) {
         recorder && recorder.exportWAV(function(blob) {
           var url = URL.createObjectURL(blob);
           var li = document.createElement('li');
           var au = document.createElement('audio');
           var hf = document.createElement('a');
-            const recordings = document.getElementById("recordings");
+            const recording = document.getElementById("recording"+count);
+
+            for (var i =recording.childNodes.length-1; i>=0; i--) {
+                recording.removeChild(recording.childNodes[i]);
+            }
+
           au.controls = true;
           au.src = url;
           hf.href = url;
@@ -123,10 +141,12 @@
           hf.innerHTML = hf.download;
           li.appendChild(au);
           li.appendChild(hf);
-          recordings.appendChild(li);
+          recording.appendChild(li)
+            console.log(hf.download)
+            document.getElementById("audio"+count).value = hf.download;
         });
       }
-        function audioRecognize() {
+        function audioRecognize(count) {
             recorder && recorder.exportWAV(function (blob) {
                 let reader = new FileReader();
                 reader.onload = function () {
@@ -135,7 +155,7 @@
                         "config": {
                             "encoding": "LINEAR16",
                             "sampleRateHertz": 44100, // 環境によってかわるっぽいので変えてください(おそらくエラーに正しい値が出てくると思います.
-                             "languageCode": "en-US",
+                            "languageCode": "en-US",
                             "audio_channel_count": 2
                         },
                         "audio": {
@@ -157,8 +177,8 @@
                         console.log("RESULT: " + text);
                         console.log(result_json.results[0].alternatives[0].transcript);
                         console.log(data)
-                        document.getElementById("translation").textContent=result_json.results[0].alternatives[0].transcript;
-                        document.getElementById("confidence").textContent=result_json.results[0].alternatives[0].confidence;
+                        document.getElementById("translation"+count).textContent=result_json.results[0].alternatives[0].transcript;
+                        document.getElementById("confidence"+count).textContent=result_json.results[0].alternatives[0].confidence;
                     });
                 };
                 reader.readAsArrayBuffer(blob)
@@ -181,6 +201,22 @@
       __log('No live audio input: ' + e);
     });
   };
+
+      function myFunction(counter) {
+          // Get the checkbox
+          console.log("myCheck"+counter);
+          var checkBox = document.getElementById("myCheck"+counter);
+          // Get the output text
+          var text = document.getElementById("img"+counter);
+
+          // If the checkbox is checked, display the output text
+          if (checkBox.checked == true){
+            text.style.display = "block";
+            checkBox.style.display ="none";
+          } else {
+            text.style.display = "none";
+          }
+        }
     </script>
 
 {% endblock %}

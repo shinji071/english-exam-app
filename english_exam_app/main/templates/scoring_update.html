@@ -28,37 +28,24 @@
             </tr>
         </thead>
         <tbody>
+        {% for ans in answers %}
             <tr>
-                <td>太郎</td>
-                <td>1. Do you have brothers</td>
-                <td>音声ファイル入る</td>
-                <td>Yes, I do.</td>
-                <th>Confidence</th>
-                <td>2</td>
-                <td>2</td>
-                <td>いいねえ。</td>
+                <td>{{ ans.user}}</td>
+                <td> {{ans.question}}</td>
+                <td><audio
+        controls
+        src= {{ ans.voice_file }}>
+            Your browser does not support the
+            <code>audio</code> element.
+    </audio></td>
+                <td> {{ ans.answer}}</td>
+                <th> {{ ans.confidence }}</th>
+                <td> {{ ans.auto_point }}</td>
+                <td> {{ ans.auto_point2 }}</td>
+                <td> </td>
 
             </tr>
-            <tr>
-                <td>太郎</td>
-                <td>1. Do you have brothers</td>
-                <td>音声ファイル入る</td>
-                <td>Yes, I do.</td>
-                <th>Confidence</th>
-                <td>2</td>
-                <td>2</td>
-                <td>いいねえ。</td>
-            </tr>
-            <tr>
-                <td>太郎</td>
-                <td>1. Do you have brothers</td>
-                <td>音声ファイル入る</td>
-                <td>Yes, I do.</td>
-                <th>Confidence</th>
-                <td>2</td>
-                <td>2</td>
-                <td>いいねえ。</td>
-            </tr>
+        {% endfor %}
         </tfoot>
             </table>
         </div>

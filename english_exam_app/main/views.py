@@ -8,7 +8,7 @@ from django.views import generic
 from django.views.generic import View
 
 from .forms import InquiryForm, DiaryCreateForm
-from .models import Diary, Question
+from .models import Diary, Question, Answer
 
 logger = logging.getLogger(__name__)
 
@@ -50,8 +50,6 @@ class ScoringListView(LoginRequiredMixin, generic.ListView):
 class DiaryDetailView(LoginRequiredMixin, generic.DetailView):
     model = Diary
     template_name = 'diary_detail.html'
-
-
 
 class DiaryCreateView(LoginRequiredMixin, generic.CreateView):
     model = Diary
@@ -97,11 +95,36 @@ class DiaryDeleteView(LoginRequiredMixin, generic.DeleteView):
 
 class ExamView(LoginRequiredMixin, View):
     def get(self, request, *args, **kwargs):
-        contents = Question.objects.all()
+        chapter = Diary.objects.get(id=kwargs['pk'])
+        contents = Question.objects.filter(chapter=chapter.id)
         # todo データやりとり実施
-        title = "test123"
-        return render(request, 'main/examination.html', {'questions':contents, "title":title })
+        title = chapter.title
+        return render(request, 'examination.html', {'questions':contents, "title":title })
+
+    def post(self, request, *args, **kwargs):
+        logger.debug(request.user)
+        logger.debug(request.POST)
+        logger.debug(request.FILES)
+        logger.debug(args)
+        logger.debug(kwargs)
+
+        chapter = Diary.objects.get(id=kwargs['pk'])
+        contents = Question.objects.filter(chapter=chapter.id)
+
+        for c in contents:
+            answer = Answer(question=c, user=request.user, answer=request.POST['translation{0}'.format(c.title)],
+                            voice_file=request.FILES['audio{0}'.format(c.title)], confidence=request.POST['confidence{0}'.format(c.title)])
+            answer.save()
+        return render(request, 'examination.html', {'questions': [], "title": "test"})
 
 class ScoringUpdateView(LoginRequiredMixin, generic.DetailView):
     def get(self, request, *args, **kwargs):
-        return render(request, 'scoring_update.html', {})
+        logger.debug(kwargs)
+        chapter = Diary.objects.get(id=kwargs['pk'])
+        questions = Question.objects.filter(chapter=chapter.id)
+        answers = []
+        for q in questions:
+            anss = Answer.objects.filter(question=q)
+            for ans in anss:
+                answers.append(ans)
+        return render(request, 'scoring_update.html', {"answers":answers})

@@ -58,11 +58,11 @@ class Question(models.Model):
 
 class Answer(models.Model):
     """回答"""
-
     question = models.ForeignKey(Question, verbose_name="テスト", on_delete=models.PROTECT)
     user = models.ForeignKey(CustomUser, verbose_name='ユーザー', on_delete=models.PROTECT, null=True)
     answer = models.CharField(verbose_name='タイトル', max_length=400)
-    voice_file = models.FileField(upload_to='musics/')
+    confidence = models.CharField(verbose_name='信頼度', default="-1", max_length=50)
+    voice_file = models.FileField()
     auto_point = models.IntegerField(verbose_name="知識・技能", default=-1)
     auto_point2 = models.IntegerField(verbose_name="思考・判断・表現", default=-1)
 
@@ -70,4 +70,4 @@ class Answer(models.Model):
         verbose_name_plural = '回答'
 
     def __str__(self):
-        return self.question
+        return self.answer
