@@ -112,8 +112,13 @@ class ExamView(LoginRequiredMixin, View):
         contents = Question.objects.filter(chapter=chapter.id)
 
         for c in contents:
-            answer = Answer(question=c, user=request.user, answer=request.POST['translation{0}'.format(c.title)],
+            trans = request.POST['translation{0}'.format(c.title)]
+            answer = Answer(question=c, user=request.user, answer=trans,
                             voice_file=request.FILES['audio{0}'.format(c.title)], confidence=request.POST['confidence{0}'.format(c.title)])
+            trans_edit = trans.lower().replace(" ","").replace(".","").replace(",","")
+            lst_answer_1 = c.answer_1.split('/')
+            lst_answer_2 = c.answer_2.split('/')
+
             answer.save()
         return render(request, 'examination.html', {'questions': [], "title": "test"})
 

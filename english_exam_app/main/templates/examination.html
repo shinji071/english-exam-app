@@ -147,42 +147,125 @@
         });
       }
         function audioRecognize(count) {
-            recorder && recorder.exportWAV(function (blob) {
-                let reader = new FileReader();
-                reader.onload = function () {
-                    let result = new Uint8Array(reader.result); // reader.result is ArrayBuffer
-                    let data = {
-                        "config": {
-                            "encoding": "LINEAR16",
-                            "sampleRateHertz": 44100, // 環境によってかわるっぽいので変えてください(おそらくエラーに正しい値が出てくると思います.
-                            "languageCode": "en-US",
-                            "audio_channel_count": 2
-                        },
-                        "audio": {
-                            "content": arrayBufferToBase64(result)
-                        }
-                    };
-                    console.log("audio send...");
-                    fetch('https://speech.googleapis.com/v1/speech:recognize?key=' + apiKey, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json; charset=utf-8'
-                        },
-                        body: JSON.stringify(data)
-                    }).then(function (response) {
-                        return response.text();
-                    }).then(function (text) {
-                        let result_json = JSON.parse(text);
-                        //テキストデータ自体はresult_json.results[0].alternatives[0].transcriptに格納
-                        console.log("RESULT: " + text);
-                        console.log(result_json.results[0].alternatives[0].transcript);
-                        console.log(data)
-                        document.getElementById("translation"+count).textContent=result_json.results[0].alternatives[0].transcript;
-                        document.getElementById("confidence"+count).textContent=result_json.results[0].alternatives[0].confidence;
-                    });
-                };
-                reader.readAsArrayBuffer(blob)
-            });
+          try {
+              recorder && recorder.exportWAV(function (blob) {
+                  let reader = new FileReader();
+                  reader.onload = function () {
+                      console.log("first try");
+                      let result = new Uint8Array(reader.result); // reader.result is ArrayBuffer
+                      let data = {
+                          "config": {
+                              "encoding": "LINEAR16",
+                              "sampleRateHertz": 48000, // 環境によってかわるっぽいので変えてください(おそらくエラーに正しい値が出てくると思います.
+                              "languageCode": "en-US",
+                              "audio_channel_count": 2
+                          },
+                          "audio": {
+                              "content": arrayBufferToBase64(result)
+                          }
+                      };
+                      console.log("audio send...");
+                      fetch('https://speech.googleapis.com/v1/speech:recognize?key=' + apiKey, {
+                          method: 'POST',
+                          headers: {
+                              'Content-Type': 'application/json; charset=utf-8'
+                          },
+                          body: JSON.stringify(data)
+                      }).then(function (response) {
+                          return response.text();
+                      }).then(function (text) {
+                          let result_json = JSON.parse(text);
+                          //テキストデータ自体はresult_json.results[0].alternatives[0].transcriptに格納
+                          console.log("RESULT: " + text);
+                          console.log(result_json.results[0].alternatives[0].transcript);
+                          console.log(data)
+                          document.getElementById("translation" + count).textContent = result_json.results[0].alternatives[0].transcript;
+                          document.getElementById("confidence" + count).textContent = result_json.results[0].alternatives[0].confidence;
+                      });
+                  };
+                  reader.readAsArrayBuffer(blob)
+              });
+          }
+          catch(e) {
+              try{
+              recorder && recorder.exportWAV(function (blob) {
+                  let reader = new FileReader();
+                  reader.onload = function () {
+                      console.log("second try");
+                      let result = new Uint8Array(reader.result); // reader.result is ArrayBuffer
+                      let data = {
+                          "config": {
+                              "encoding": "LINEAR16",
+                             //"sampleRateHertz": 44100, // 環境によってかわるっぽいので変えてください(おそらくエラーに正しい値が出てくると思います.
+                              "languageCode": "en-US",
+                              "audio_channel_count": 2
+                          },
+                          "audio": {
+                              "content": arrayBufferToBase64(result)
+                          }
+                      };
+                      console.log("audio send...");
+                      fetch('https://speech.googleapis.com/v1/speech:recognize?key=' + apiKey, {
+                          method: 'POST',
+                          headers: {
+                              'Content-Type': 'application/json; charset=utf-8'
+                          },
+                          body: JSON.stringify(data)
+                      }).then(function (response) {
+                          return response.text();
+                      }).then(function (text) {
+                          let result_json = JSON.parse(text);
+                          //テキストデータ自体はresult_json.results[0].alternatives[0].transcriptに格納
+                          console.log("RESULT: " + text);
+                          console.log(result_json.results[0].alternatives[0].transcript);
+                          console.log(data)
+                          document.getElementById("translation" + count).textContent = result_json.results[0].alternatives[0].transcript;
+                          document.getElementById("confidence" + count).textContent = result_json.results[0].alternatives[0].confidence;
+                      });
+                  };
+                  reader.readAsArrayBuffer(blob)
+              });}
+              catch(e)
+              {
+                  recorder && recorder.exportWAV(function (blob) {
+                      console.log("third try");
+                  let reader = new FileReader();
+                  reader.onload = function () {
+                      let result = new Uint8Array(reader.result); // reader.result is ArrayBuffer
+                      let data = {
+                          "config": {
+                              "encoding": "LINEAR16",
+                              "sampleRateHertz": 16000, // 環境によってかわるっぽいので変えてください(おそらくエラーに正しい値が出てくると思います.
+                              "languageCode": "en-US",
+                              "audio_channel_count": 2
+                          },
+                          "audio": {
+                              "content": arrayBufferToBase64(result)
+                          }
+                      };
+                      console.log("audio send...");
+                      fetch('https://speech.googleapis.com/v1/speech:recognize?key=' + apiKey, {
+                          method: 'POST',
+                          headers: {
+                              'Content-Type': 'application/json; charset=utf-8'
+                          },
+                          body: JSON.stringify(data)
+                      }).then(function (response) {
+                          return response.text();
+                      }).then(function (text) {
+                          let result_json = JSON.parse(text);
+                          //テキストデータ自体はresult_json.results[0].alternatives[0].transcriptに格納
+                          console.log("RESULT: " + text);
+                          console.log(result_json.results[0].alternatives[0].transcript);
+                          console.log(data)
+                          document.getElementById("translation" + count).textContent = result_json.results[0].alternatives[0].transcript;
+                          document.getElementById("confidence" + count).textContent = result_json.results[0].alternatives[0].confidence;
+                      });
+                  };
+                  reader.readAsArrayBuffer(blob)
+              });
+              }
+          }
         }
 
   window.onload = function init() {
