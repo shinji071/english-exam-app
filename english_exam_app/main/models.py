@@ -46,6 +46,7 @@ class Question(models.Model):
 
     answer_1 = models.TextField(verbose_name='回答1', blank=True, null=True)
     answer_2 = models.TextField(verbose_name='回答2', blank=True, null=True)
+    answer_3 = models.TextField(verbose_name='回答3', blank=True, null=True)
 
     created_at = models.DateTimeField(verbose_name='作成日時', auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name='更新日時', auto_now=True)

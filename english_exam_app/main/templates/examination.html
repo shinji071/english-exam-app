@@ -33,7 +33,11 @@
                 <img class="mr-3" src="/static/img/quest.png" alt="" width="48" height="48">
                 <div class="lh-100">
                   <h6 class="mb-0 text-white lh-100">{{title}}</h6>
+                    {% if isdone %}
                   <small>上から順番に解いていこう。マイクマークをクリックして音声を入力しよう。</small>
+                    {% else %}
+                    <small>Today's aphorism：There is always light behind the clouds.</small>
+                    {% endif %}
                 </div>
               </div>
         </div>
@@ -65,17 +69,22 @@
                          <button onclick="stopRecording(this, '{{question.title}}')" disabled>stop</button>
                       <div class="row">
                         <div id="{{'recording'|add:question.title}}"></div>
-                          <input type="file" id="{{'audio'|add:question.title}}" name="{{'audio'|add:question.title}}" accept="*" required>
+                          <input type="file" id="{{'audio'|add:question.title}}" name="{{'audio'|add:question.title}}" accept="*" hidden>
                       </div>
                       <div class="row">
-                        <input id="{{'translation'|add:question.title}}" name="{{'translation'|add:question.title}}" required></input><br>
-                          <input id="{{'confidence'|add:question.title}}" name="{{'confidence'|add:question.title}}" required></input>
+                        <input id="{{'translation'|add:question.title}}" name="{{'translation'|add:question.title}}"></input><br>
+                          <input id="{{'confidence'|add:question.title}}" name="{{'confidence'|add:question.title}}"></input>
+                          <p id="{{'reg'|add:question.title}}">未登録</p>
                       </div>
 
             </div>
         </div>
         {% endfor %}
-      <input type ="submit" class="btn btn-info mt-5 ml-2 mb-3"></input>
+      {% if isdone %}
+        <input type ="submit" class="btn btn-info mt-5 ml-2 mb-3" hidden></input>
+      {% else %}
+       <input type ="submit" class="btn btn-info mt-5 ml-2 mb-3"></input>
+      {% endif %}
     </div>
 </form>
 
@@ -124,6 +133,7 @@
       }
     function createDownloadLink(count) {
         recorder && recorder.exportWAV(function(blob) {
+            console.log("test1")
           var url = URL.createObjectURL(blob);
           var li = document.createElement('li');
           var au = document.createElement('audio');
@@ -141,13 +151,17 @@
           hf.innerHTML = hf.download;
           li.appendChild(au);
           li.appendChild(hf);
-          recording.appendChild(li)
-            console.log(hf.download)
-            document.getElementById("audio"+count).value = hf.download;
+          console.log("test");
+          recording.appendChild(li);
+            document.getElementById("reg"+count).innerHTML = "登録済み";
+           // document.getElementById("audio"+count).value = hf.download;
+          console.log("--------");
+          console.log(document.getElementById("translation" + count).textContent);
+
+
         });
       }
         function audioRecognize(count) {
-          try {
               recorder && recorder.exportWAV(function (blob) {
                   let reader = new FileReader();
                   reader.onload = function () {
@@ -156,7 +170,7 @@
                       let data = {
                           "config": {
                               "encoding": "LINEAR16",
-                              "sampleRateHertz": 48000, // 環境によってかわるっぽいので変えてください(おそらくエラーに正しい値が出てくると思います.
+                              //"sampleRateHertz": 48000, // 環境によってかわるっぽいので変えてください(おそらくエラーに正しい値が出てくると思います.
                               "languageCode": "en-US",
                               "audio_channel_count": 2
                           },
@@ -179,93 +193,14 @@
                           console.log("RESULT: " + text);
                           console.log(result_json.results[0].alternatives[0].transcript);
                           console.log(data)
-                          document.getElementById("translation" + count).textContent = result_json.results[0].alternatives[0].transcript;
-                          document.getElementById("confidence" + count).textContent = result_json.results[0].alternatives[0].confidence;
+                          document.getElementById("translation" + count).value = result_json.results[0].alternatives[0].transcript;
+                          document.getElementById("confidence" + count).value = result_json.results[0].alternatives[0].confidence;
+                          console.log("--------")
+                          console.log(document.getElementById("translation" + count).textContent)
                       });
                   };
                   reader.readAsArrayBuffer(blob)
               });
-          }
-          catch(e) {
-              try{
-              recorder && recorder.exportWAV(function (blob) {
-                  let reader = new FileReader();
-                  reader.onload = function () {
-                      console.log("second try");
-                      let result = new Uint8Array(reader.result); // reader.result is ArrayBuffer
-                      let data = {
-                          "config": {
-                              "encoding": "LINEAR16",
-                             //"sampleRateHertz": 44100, // 環境によってかわるっぽいので変えてください(おそらくエラーに正しい値が出てくると思います.
-                              "languageCode": "en-US",
-                              "audio_channel_count": 2
-                          },
-                          "audio": {
-                              "content": arrayBufferToBase64(result)
-                          }
-                      };
-                      console.log("audio send...");
-                      fetch('https://speech.googleapis.com/v1/speech:recognize?key=' + apiKey, {
-                          method: 'POST',
-                          headers: {
-                              'Content-Type': 'application/json; charset=utf-8'
-                          },
-                          body: JSON.stringify(data)
-                      }).then(function (response) {
-                          return response.text();
-                      }).then(function (text) {
-                          let result_json = JSON.parse(text);
-                          //テキストデータ自体はresult_json.results[0].alternatives[0].transcriptに格納
-                          console.log("RESULT: " + text);
-                          console.log(result_json.results[0].alternatives[0].transcript);
-                          console.log(data)
-                          document.getElementById("translation" + count).textContent = result_json.results[0].alternatives[0].transcript;
-                          document.getElementById("confidence" + count).textContent = result_json.results[0].alternatives[0].confidence;
-                      });
-                  };
-                  reader.readAsArrayBuffer(blob)
-              });}
-              catch(e)
-              {
-                  recorder && recorder.exportWAV(function (blob) {
-                      console.log("third try");
-                  let reader = new FileReader();
-                  reader.onload = function () {
-                      let result = new Uint8Array(reader.result); // reader.result is ArrayBuffer
-                      let data = {
-                          "config": {
-                              "encoding": "LINEAR16",
-                              "sampleRateHertz": 16000, // 環境によってかわるっぽいので変えてください(おそらくエラーに正しい値が出てくると思います.
-                              "languageCode": "en-US",
-                              "audio_channel_count": 2
-                          },
-                          "audio": {
-                              "content": arrayBufferToBase64(result)
-                          }
-                      };
-                      console.log("audio send...");
-                      fetch('https://speech.googleapis.com/v1/speech:recognize?key=' + apiKey, {
-                          method: 'POST',
-                          headers: {
-                              'Content-Type': 'application/json; charset=utf-8'
-                          },
-                          body: JSON.stringify(data)
-                      }).then(function (response) {
-                          return response.text();
-                      }).then(function (text) {
-                          let result_json = JSON.parse(text);
-                          //テキストデータ自体はresult_json.results[0].alternatives[0].transcriptに格納
-                          console.log("RESULT: " + text);
-                          console.log(result_json.results[0].alternatives[0].transcript);
-                          console.log(data)
-                          document.getElementById("translation" + count).textContent = result_json.results[0].alternatives[0].transcript;
-                          document.getElementById("confidence" + count).textContent = result_json.results[0].alternatives[0].confidence;
-                      });
-                  };
-                  reader.readAsArrayBuffer(blob)
-              });
-              }
-          }
         }
 
   window.onload = function init() {
