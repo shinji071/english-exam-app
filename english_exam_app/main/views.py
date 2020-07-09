@@ -131,6 +131,7 @@ class ExamView(LoginRequiredMixin, View):
                 answer.auto_point2 = 3
             answer.save()
         return render(request, 'examination.html', {'questions': [], "title": "テストお疲れ様でした！先生のフィードバックを楽しみに待っていていね！", "isdone":True})
+
 class ScoringUpdateView(LoginRequiredMixin, generic.DetailView):
     def get(self, request, *args, **kwargs):
         logger.debug(kwargs)
