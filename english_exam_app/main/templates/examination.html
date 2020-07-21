@@ -207,10 +207,19 @@
     try {
       // webkit shim
       window.AudioContext = window.AudioContext || window.webkitAudioContext;
-      navigator.mediaDevices.getUserMedia = ( navigator.getUserMedia ||
-                       navigator.webkitGetUserMedia ||
-                       navigator.mozGetUserMedia ||
-                       navigator.msGetUserMedia);
+    navigator.mediaDevices = navigator.mediaDevices || ((navigator.mozGetUserMedia || navigator.webkitGetUserMedia) ? {
+       getUserMedia: function(c) {
+         return new Promise(function(y, n) {
+           (navigator.mozGetUserMedia ||
+            navigator.webkitGetUserMedia).call(navigator, c, y, n);
+         });
+       }
+    } : null);
+
+    if (!navigator.mediaDevices) {
+      console.log("getUserMedia() not supported.");
+      return;
+    }
       window.URL = window.URL || window.webkitURL;
 
       audio_context = new AudioContext;
