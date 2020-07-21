@@ -217,7 +217,11 @@ function createDownloadLink(blob) {
 	var au = document.createElement('audio');
 	var li = document.createElement('li');
 	var link = document.createElement('a');
+      const recording = document.getElementById("recording"+COUNT);
 
+    for (var i =recording.childNodes.length-1; i>=0; i--) {
+        recording.removeChild(recording.childNodes[i]);
+    }
 	//name of .wav file to use during upload and download (without extendion)
 	var filename = new Date().toISOString();
 
@@ -259,11 +263,6 @@ function createDownloadLink(blob) {
 	//li.appendChild(upload)//add the upload link to li
 
 	//add the li element to the ol
-      const recording = document.getElementById("recording"+COUNT);
-
-    for (var i =recording.childNodes.length-1; i>=0; i--) {
-        recording.removeChild(recording.childNodes[i]);
-    }
 
 	recording.appendChild(li);
 }
