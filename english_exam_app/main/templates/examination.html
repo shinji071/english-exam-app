@@ -191,10 +191,10 @@ function startRecording(button) {
             button.nextElementSibling.disabled = true;
 	});
 }
-
+let COUNT;
 function stopRecording(button, count) {
 	console.log("stopButton clicked");
-
+    COUNT = count
 	//disable the stop button, enable the record too allow for new recordings
    button.disabled = true;
    button.previousElementSibling.disabled = false;
@@ -209,10 +209,10 @@ function stopRecording(button, count) {
 	gumStream.getAudioTracks()[0].stop();
 
 	//create the wav blob and pass it on to createDownloadLink
-	rec.exportWAV(createDownloadLink(count));
+	rec.exportWAV(createDownloadLink);
 }
 
-function createDownloadLink(blob, count) {
+function createDownloadLink(blob) {
 
 	var url = URL.createObjectURL(blob);
 	var au = document.createElement('audio');
@@ -260,7 +260,7 @@ function createDownloadLink(blob, count) {
 	li.appendChild(upload)//add the upload link to li
 
 	//add the li element to the ol
-      const recording = document.getElementById("recording"+count);
+      const recording = document.getElementById("recording"+COUNT);
 
     for (var i =recording.childNodes.length-1; i>=0; i--) {
         recording.removeChild(recording.childNodes[i]);
