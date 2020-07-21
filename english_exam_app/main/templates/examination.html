@@ -185,9 +185,8 @@ function startRecording(button) {
 
 	}).catch(function(err) {
 	  	//enable the record button if getUserMedia() fails
-    	recordButton.disabled = false;
-    	stopButton.disabled = true;
-    	pauseButton.disabled = true
+ 	            button.disabled = false;
+            button.nextElementSibling.disabled = true;
 	});
 }
 
@@ -199,7 +198,7 @@ function stopRecording(button, count) {
    button.previousElementSibling.disabled = false;
 
 	//reset button just in case the recording is stopped while paused
-	pauseButton.innerHTML="Pause";
+	//pauseButton.innerHTML="Pause";
 
 	//tell the recorder to stop the recording
 	rec.stop();
