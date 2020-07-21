@@ -184,6 +184,8 @@ function startRecording(button) {
 		console.log("Recording started");
 
 	}).catch(function(err) {
+	    console.log("Error")
+        console.log(err)
 	  	//enable the record button if getUserMedia() fails
  	            button.disabled = false;
             button.nextElementSibling.disabled = true;
