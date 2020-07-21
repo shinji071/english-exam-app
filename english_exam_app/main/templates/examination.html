@@ -227,7 +227,8 @@
     } catch (e) {
       alert('No web audio support in this browser!');
     }
-
+    console.log("success audio");
+    console.log(navigator.mediaDevices)
     navigator.mediaDevices.getUserMedia({audio: true}, startUserMedia, function(e) {
       __log('No live audio input: ' + e);
     });
