@@ -128,10 +128,6 @@ function startRecording(button) {
     }
       window.URL = window.URL || window.webkitURL;
 
-      audio_context = new AudioContext;
-    } catch (e) {
-      alert('No web audio support in this browser!');
-    }
     console.log("success audio");
     console.log(navigator.mediaDevices)
 	console.log("recordButton clicked");
