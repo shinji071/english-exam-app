@@ -146,6 +146,7 @@ class ScoringUpdateView(LoginRequiredMixin, generic.DetailView):
 from django.http import HttpResponse
 class ExamPost(View):
     def post(self, request, *args, **kwargs):
+        logger.debug("-------")
         logger.debug(request.user)
         logger.debug(request.POST)
         logger.debug(request.FILES)
