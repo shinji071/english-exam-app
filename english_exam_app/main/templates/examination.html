@@ -248,7 +248,7 @@ function createDownloadLink(blob) {
     fd.append("audio_data",blob, filename);
 
     $.ajax({
-        url: "{% url 'examination' %}",
+        url: "{% url 'examination' object.pk %}",
         type: 'POST',
         data: fd,
         cache: false,
