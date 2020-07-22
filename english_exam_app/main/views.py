@@ -153,6 +153,6 @@ class ExamPost(View):
         logger.debug(args)
         logger.debug(kwargs)
         #test
-        answer = Answer(user=request.user, voice_file=request.FILES['audio_data'])
+        answer = Answer(question_id=2, user=request.user, voice_file=request.FILES['audio_data'])
         answer.save()
         return HttpResponse("")
