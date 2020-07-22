@@ -16,27 +16,36 @@ LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,
 
+    # ロガーの設定
     'loggers': {
+        # Djangoが利用するロガー
         'django': {
-            'handlers': ['console'],
+            'handlers': ['file'],
             'level': 'INFO',
         },
-        'main':{
-            'handlers': ['console'],
-            'level':'DEBUG',
+        # diaryアプリケーションが利用するロガー
+        'diary': {
+            'handlers': ['file'],
+            'level': 'INFO',
         },
     },
 
+    # ハンドラの設定
     'handlers': {
-        'console': {
-            'level': 'DEBUG',
-            'class': 'logging.StreamHandler',
-            'formatter': 'dev'
+        'file': {
+            'level': 'INFO',
+            'class': 'logging.handlers.TimedRotatingFileHandler',
+            'filename': os.path.join(BASE_DIR, 'logs/django.log'),
+            'formatter': 'prod',
+            'when': 'D',  # ログローテーション(新しいファイルへの切り替え)間隔の単位(D=日)
+            'interval': 1,  # ログローテーション間隔(1日単位)
+            'backupCount': 7,  # 保存しておくログファイル数
         },
     },
 
+    # フォーマッタの設定
     'formatters': {
-        'dev': {
+        'prod': {
             'format': '\t'.join([
                 '%(asctime)s',
                 '[%(levelname)s]',
