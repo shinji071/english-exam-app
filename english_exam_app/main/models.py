@@ -56,7 +56,6 @@ class Question(models.Model):
 
     def __str__(self):
         return self.title
-
 class Answer(models.Model):
     """回答"""
     question = models.ForeignKey(Question, verbose_name="テスト", on_delete=models.PROTECT)

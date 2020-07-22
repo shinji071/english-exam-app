@@ -153,6 +153,9 @@ class ExamPost(View):
         logger.debug(args)
         logger.debug(kwargs)
         #test
-        answer = Answer(question_id=2, user=request.user, voice_file=request.FILES['audio_data'])
+        q = Question.objects.all()[0]
+        answers = []
+
+        answer = Answer(question=q, user=request.user, voice_file=request.FILES['audio_data'])
         answer.save()
         return HttpResponse("")
