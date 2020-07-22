@@ -128,7 +128,7 @@ class ExamView(LoginRequiredMixin, View):
              #   answer.auto_point = 2
             #if trans_edit in lst_answer_3:
              #   answer.auto_point2 = 3
-            answer.save()
+            #answer.save()
         return render(request, 'examination.html', {'questions': [], "title": "テストお疲れ様でした！先生のフィードバックを楽しみに待っていていね！", "isdone":True})
 
 class ScoringUpdateView(LoginRequiredMixin, generic.DetailView):
