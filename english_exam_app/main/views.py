@@ -155,7 +155,7 @@ class ExamPost(View):
         #test
         q = Question.objects.all()[0]
         answers = []
-
-        answer = Answer(question=q, user=request.user, voice_file=request.FILES['audio_data'])
+        #aaa
+        answer = Answer(question=q, answer="aaa", user=request.user, voice_file=request.FILES['audio_data'])
         answer.save()
         return HttpResponse("")
