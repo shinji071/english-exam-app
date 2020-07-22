@@ -13,5 +13,7 @@ urlpatterns = [
     path('diary-create/', views.DiaryCreateView.as_view(), name="diary_create"),
     path('diary-update/<int:pk>/', views.DiaryUpdateView.as_view(), name="diary_update"),
     path('diary-delete/<int:pk>/', views.DiaryDeleteView.as_view(), name="diary_delete"),
-    path('examination/<int:pk>/', csrf_exempt(views.ExamView.as_view()), name="examination")
+    path('examination/<int:pk>/', csrf_exempt(views.ExamView.as_view()), name="examination"),
+    path('examination/post/', csrf_exempt(views.ExamPost.as_view()), name="exam_post")
+
 ]

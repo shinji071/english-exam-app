@@ -72,9 +72,6 @@
                         <div id="{{'recording'|add:question.title}}"></div>
                           <input type="file" id="{{'audio'|add:question.title}}" name="{{'audio'|add:question.title}}" accept="*" hidden>
                       </div>
-                      <div class="row">
-                          <p id="{{'reg'|add:question.title}}">未登録</p>
-                      </div>
 
             </div>
         </div>
@@ -217,8 +214,8 @@ function createDownloadLink(blob) {
 	var au = document.createElement('audio');
 	var li = document.createElement('li');
 	var link = document.createElement('a');
-      const recording = document.getElementById("recording"+COUNT);
-
+	1
+    const recording = document.getElementById("recording"+COUNT);
     for (var i =recording.childNodes.length-1; i>=0; i--) {
         recording.removeChild(recording.childNodes[i]);
     }
@@ -244,21 +241,34 @@ function createDownloadLink(blob) {
 	li.appendChild(link);
 
 	//upload link
-	//var upload = document.createElement('a');
-	//upload.href="#";
+	var upload = document.createElement('a');
+
 	//upload.innerHTML = "Upload";
-	//upload.addEventListener("click", function(event){
-	//	  var xhr=new XMLHttpRequest();
-	//	  xhr.onload=function(e) {
-	//	      if(this.readyState === 4) {
-	//	          console.log("Server returned: ",e.target.responseText);
-	//	      }
-	//	  };
-	//	  var fd=new FormData();
-	//	  fd.append("audio_data",blob, filename);
-	//	  xhr.open("POST","upload.php",true);
-	//	  xhr.send(fd);
-	//})
+	var fd = new FormData();
+    fd.append("audio_data",blob, filename);
+
+    $.ajax({
+        url: "{% url 'exam_post' %}",
+        type: 'POST',
+        data: fd,
+        cache: false,
+        processData: false, // essential
+        contentType: false, // essential, application/pdf doesn't work.
+        enctype: 'multipart/form-data',
+
+        // If sucess, download file
+        success: function(data, status, xhr) {
+              console.log(data);}});
+		//  var xhr=new XMLHttpRequest();
+	    //	  xhr.onload=function(e) {
+       //   if(this.readyState === 4) {
+	   //       console.log("Server returned: ",e.target.responseText);
+	   //   }
+	  //};
+	  //var fd=new FormData();
+
+	  //xhr.open("POST",'https://httpbin.org/post',true);
+	  //xhr.send(fd);
 	li.appendChild(document.createTextNode (" "))//add a space in between
 	//li.appendChild(upload)//add the upload link to li
 
