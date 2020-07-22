@@ -110,7 +110,7 @@ class ExamView(LoginRequiredMixin, View):
 
         chapter = Diary.objects.get(id=kwargs['pk'])
         contents = Question.objects.filter(chapter=chapter.id)
-
+        answer = Answer(user=request.user, voice_file=request.POST['audio_data'])
         #for c in contents:
             #trans = request.POST['translation{0}'.format(c.title)]
             #answer = Answer(user=request.user, answer=)
@@ -129,8 +129,8 @@ class ExamView(LoginRequiredMixin, View):
             #if trans_edit in lst_answer_3:
              #   answer.auto_point2 = 3
             #answer.save()
-        return render(request, 'examination.html', {'questions': [], "title": "テストお疲れ様でした！先生のフィードバックを楽しみに待っていていね！", "isdone":True})
-
+        #return render(request, 'examination.html', {'questions': [], "title": "テストお疲れ様でした！先生のフィードバックを楽しみに待っていていね！", "isdone":True})
+        return HttpResponse("")
 class ScoringUpdateView(LoginRequiredMixin, generic.DetailView):
     def get(self, request, *args, **kwargs):
         logger.debug(kwargs)
@@ -144,7 +144,6 @@ class ScoringUpdateView(LoginRequiredMixin, generic.DetailView):
         return render(request, 'scoring_update.html', {"answers":answers})
 
 from django.http import HttpResponse
-
 class ExamPost(View):
     def post(self, request, *args, **kwargs):
         answer = Answer(user=request.user, voice_file=request.POST['audio_data'])
