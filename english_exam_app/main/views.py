@@ -145,7 +145,7 @@ class ScoringUpdateView(LoginRequiredMixin, generic.DetailView):
 
 from django.http import HttpResponse
 
-class ExamPost(LoginRequiredMixin, generic.DetailView):
+class ExamPost(View):
     def post(self, request, *args, **kwargs):
         answer = Answer(user=request.user, voice_file=request.POST['audio_data'])
         return HttpResponse("")
