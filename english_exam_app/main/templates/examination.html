@@ -300,6 +300,7 @@ function createDownloadLink(blob) {
     function audioRecognize(count) {
         console.log("In AudioRecognize");
           recorder && recorder.exportWAV(function (blob) {
+              console.log("recorder");
               let reader = new FileReader();
               reader.onload = function () {
                   console.log("first try");
