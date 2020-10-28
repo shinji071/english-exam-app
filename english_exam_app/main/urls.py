@@ -5,7 +5,6 @@ from django.views.decorators.csrf import csrf_exempt
 app_name='main'
 urlpatterns = [
     path('', views.IndexView.as_view(), name='index'),
-    path('inquiry/', views.InquiryView.as_view(), name="inquiry"),
     path('diary-list/', views.DiaryListView.as_view(), name="diary_list"),
     path('scoring-list/', views.ScoringListView.as_view(), name="scoring_list"),
     path('scoring-update/<int:pk>/', views.ScoringUpdateView.as_view(), name="scoring_update"),
