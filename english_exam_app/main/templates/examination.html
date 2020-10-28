@@ -298,6 +298,7 @@ function createDownloadLink(blob) {
 	recording.appendChild(li);
 }
     function audioRecognize(count) {
+        console.log("In AudioRecognize");
           recorder && recorder.exportWAV(function (blob) {
               let reader = new FileReader();
               reader.onload = function () {
