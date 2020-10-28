@@ -72,6 +72,11 @@
                         <div id="{{'recording'|add:question.title}}"></div>
                           <input type="file" id="{{'audio'|add:question.title}}" name="{{'audio'|add:question.title}}" accept="*" hidden>
                       </div>
+                                       <div class="row">
+                        <input id="{{'translation'|add:question.title}}" name="{{'translation'|add:question.title}}"></input><br>
+                          <input id="{{'confidence'|add:question.title}}" name="{{'confidence'|add:question.title}}"></input>
+                          <p id="{{'reg'|add:question.title}}">未登録</p>
+                      </div>
 
             </div>
         </div>
@@ -88,6 +93,20 @@
 
 
     <script>
+        var apiKey = 'AIzaSyDNurjZdypLgMdfmjdH2FXX7aSnebK7WYo';
+      let audio_context;
+        let recorder;
+
+        function arrayBufferToBase64(buffer) {
+            let binary = '';
+            let bytes = new Float32Array(buffer);
+            let len = bytes.byteLength;
+            for (let i = 0; i < len; i++) {
+                binary += String.fromCharCode(bytes[i]);
+            }
+            return window.btoa(binary);
+        }
+
         //webkitURL is deprecated but nevertheless
 URL = window.URL || window.webkitURL;
 
@@ -200,6 +219,7 @@ function stopRecording(button, count) {
 
 	//tell the recorder to stop the recording
 	rec.stop();
+    audioRecognize(count);
 
 	//stop microphone access
 	gumStream.getAudioTracks()[0].stop();
@@ -276,6 +296,47 @@ function createDownloadLink(blob) {
 
 	recording.appendChild(li);
 }
+    function audioRecognize(count) {
+          recorder && recorder.exportWAV(function (blob) {
+              let reader = new FileReader();
+              reader.onload = function () {
+                  console.log("first try");
+                  let result = new Uint8Array(reader.result); // reader.result is ArrayBuffer
+                  let data = {
+                      "config": {
+                          "encoding": "LINEAR16",
+                          //"sampleRateHertz": 48000, // 環境によってかわるっぽいので変えてください(おそらくエラーに正しい値が出てくると思います.
+                          "languageCode": "en-US",
+                          "audio_channel_count": 2
+                      },
+                      "audio": {
+                          "content": arrayBufferToBase64(result)
+                      }
+                  };
+                  console.log("audio send...");
+                  fetch('https://speech.googleapis.com/v1/speech:recognize?key=' + apiKey, {
+                      method: 'POST',
+                      headers: {
+                          'Content-Type': 'application/json; charset=utf-8'
+                      },
+                      body: JSON.stringify(data)
+                  }).then(function (response) {
+                      return response.text();
+                  }).then(function (text) {
+                      let result_json = JSON.parse(text);
+                      //テキストデータ自体はresult_json.results[0].alternatives[0].transcriptに格納
+                      console.log("RESULT: " + text);
+                      console.log(result_json.results[0].alternatives[0].transcript);
+                      console.log(data)
+                      document.getElementById("translation" + count).value = result_json.results[0].alternatives[0].transcript;
+                      document.getElementById("confidence" + count).value = result_json.results[0].alternatives[0].confidence;
+                      console.log("--------")
+                      console.log(document.getElementById("translation" + count).textContent)
+                  });
+              };
+              reader.readAsArrayBuffer(blob)
+          });
+        }
 
       function myFunction(counter) {
           // Get the checkbox
