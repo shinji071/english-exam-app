@@ -21,19 +21,19 @@ LOGGING = {
         # Djangoが利用するロガー
         'django': {
             'handlers': ['file'],
-            'level': 'INFO',
+            'level': 'DEBUG',
         },
         # diaryアプリケーションが利用するロガー
         'diary': {
             'handlers': ['file'],
-            'level': 'INFO',
+            'level': 'DEBUG',
         },
     },
 
     # ハンドラの設定
     'handlers': {
         'file': {
-            'level': 'INFO',
+            'level': 'DEBUG',
             'class': 'logging.handlers.TimedRotatingFileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/django.log'),
             'formatter': 'prod',
