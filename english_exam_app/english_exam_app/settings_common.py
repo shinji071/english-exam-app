@@ -156,11 +156,11 @@ LOGGING = {
 
     'loggers': {
         'django': {
-            'handlers': ['console'],
+            'handlers': ['file', 'console'],
             'level': 'DEBUG',
         },
         'main':{
-            'handlers': ['console'],
+            'handlers': ['file', 'console'],
             'level':'DEBUG',
         },
     },
