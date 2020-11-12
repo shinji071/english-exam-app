@@ -24,7 +24,7 @@ LOGGING = {
             'level': 'DEBUG',
         },
         # diaryアプリケーションが利用するロガー
-        'diary': {
+        'main': {
             'handlers': ['file'],
             'level': 'DEBUG',
         },
