@@ -10,7 +10,7 @@ from django.views.generic import View
 from .forms import  DiaryCreateForm
 from .models import Diary, Question, Answer
 
-logger = logging.getLogger()
+logger = logging.getLogger("main.views")
 
 
 class IndexView(generic.TemplateView):
