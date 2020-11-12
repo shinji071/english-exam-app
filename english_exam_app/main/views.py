@@ -136,12 +136,12 @@ class ScoringUpdateView(LoginRequiredMixin, generic.DetailView):
 from django.http import HttpResponse
 class ExamPost(View):
     def post(self, request, *args, **kwargs):
-        logger.debug("-------")
-        logger.debug(request.user)
-        logger.debug(request.POST)
-        logger.debug(request.FILES)
-        logger.debug(args)
-        logger.debug(kwargs)
+        logger.info("-------")
+        logger.info(request.user)
+        logger.info(request.POST)
+        logger.info(request.FILES)
+        logger.info(args)
+        logger.info(kwargs)
         #test
         q = Question.objects.all()[0]
         answers = []
